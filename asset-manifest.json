@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/projects-tracking-app/static/css/main.5f361e03.chunk.css",
+    "main.js": "/projects-tracking-app/static/js/main.dfe7fc79.chunk.js",
+    "main.js.map": "/projects-tracking-app/static/js/main.dfe7fc79.chunk.js.map",
+    "runtime-main.js": "/projects-tracking-app/static/js/runtime-main.2cebc23b.js",
+    "runtime-main.js.map": "/projects-tracking-app/static/js/runtime-main.2cebc23b.js.map",
+    "static/js/2.1940d80d.chunk.js": "/projects-tracking-app/static/js/2.1940d80d.chunk.js",
+    "static/js/2.1940d80d.chunk.js.map": "/projects-tracking-app/static/js/2.1940d80d.chunk.js.map",
+    "index.html": "/projects-tracking-app/index.html",
+    "precache-manifest.11f590e3344970b3ecb98ce7407a9162.js": "/projects-tracking-app/precache-manifest.11f590e3344970b3ecb98ce7407a9162.js",
+    "service-worker.js": "/projects-tracking-app/service-worker.js",
+    "static/css/main.5f361e03.chunk.css.map": "/projects-tracking-app/static/css/main.5f361e03.chunk.css.map",
+    "static/js/2.1940d80d.chunk.js.LICENSE.txt": "/projects-tracking-app/static/js/2.1940d80d.chunk.js.LICENSE.txt",
+    "static/media/logo.svg": "/projects-tracking-app/static/media/logo.5d5d9eef.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.2cebc23b.js",
+    "static/js/2.1940d80d.chunk.js",
+    "static/css/main.5f361e03.chunk.css",
+    "static/js/main.dfe7fc79.chunk.js"
+  ]
+}
