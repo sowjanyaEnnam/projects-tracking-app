@@ -107,7 +107,8 @@ class Releases extends Component {
     
     getTasks = (rId, index) => {
         if (this.state.index === index && this.state.enableTasks) {
-            let filteredTasks = this.props.tasks.filter(task => task.pId === rId);            
+            let filteredTasks = this.props.tasks.filter(task => task.pId === rId);
+            localStorage.setItem("rId", rId);          
             return (
                 <Tasks
                     tasks={filteredTasks}

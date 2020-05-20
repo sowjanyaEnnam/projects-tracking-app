@@ -25,7 +25,8 @@ const taskReducer = (state = initialState, action) => {
 
         case 'ADD_TASK':            
             action.task.id = ++(newState.count);
-            newState.tasks = [...newState.tasks, action.task];            
+            action.task.pId = +localStorage.getItem('rId');
+            newState.tasks = [...newState.tasks, action.task];                  
             break;
 
         case 'UPDATE_TASK':
