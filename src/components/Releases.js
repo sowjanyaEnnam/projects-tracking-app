@@ -18,7 +18,7 @@ class Releases extends Component {
             enableCreateTask: false,
             enableDropdown: false,
             progress: 'In Progress',
-            error: false,
+            error: false,            
         };
     }
 
@@ -61,7 +61,7 @@ class Releases extends Component {
         this.props.updateRelease(this.state.editRelease);
 
         this.setState({
-            editRelease: null,
+            editRelease: {},
             actionType: null,
             error: false,
         });
@@ -80,7 +80,7 @@ class Releases extends Component {
         e.stopPropagation();
         this.closeActions(e);
         this.props.deleteRelease(rId);
-    }
+    }    
 
     enableEdit = (release, index, action, e) => {
         e.stopPropagation();
@@ -104,15 +104,15 @@ class Releases extends Component {
         }
         this.setState({ enableActions: false, enableCreateTask: true });
     };
-
+    
     getTasks = (rId, index) => {
         if (this.state.index === index && this.state.enableTasks) {
-            let filteredTasks = this.props.tasks.filter(task => task.pId === rId);
+            let filteredTasks = this.props.tasks.filter(task => task.pId === rId);            
             return (
                 <Tasks
                     tasks={filteredTasks}
                     enableCreate={this.state.enableCreateTask}
-                    releaseId={rId}
+                    releaseId={rId}                    
                 />
             );
         }
@@ -151,22 +151,19 @@ class Releases extends Component {
                     <span className="light-blue lighten-4"
                         style={{ padding: '2px 4px', borderRadius: '3px' }}
                     >{status.toUpperCase()}</span>
-                );
-                break;
+                );                
             case 'un released':
                 return (
                     <span className="lime lighten-2"
                         style={{ padding: '2px 4px', borderRadius: '3px' }}
                     >{status.toUpperCase()}</span>
-                );
-                break;
+                );                
             case 'released':
                 return (
                     <span className="green lighten-3"
                         style={{ padding: '2px 4px', borderRadius: '3px' }}
                     >{status.toUpperCase()}</span>
-                );
-                break;
+                );                
             default:
                 return (
                     <span className="light-blue lighten-4"

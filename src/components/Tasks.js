@@ -13,11 +13,14 @@ const initTask = {
 class Tasks extends Component {
 
     constructor(props) {
-        super(props);
+        super(props);        
         this.state = {
             task: { ...initTask, pId: props.releaseId },
             error: false,
             enableDropdown: false,
+            index: null,
+            taskEdit: {},
+            actionType: null,
         };
     }
 
@@ -57,7 +60,28 @@ class Tasks extends Component {
         return date.split('-').reverse().join('/');
     };
 
-    addTask = () => {
+    updateTask = (e) => {
+        e.stopPropagation();
+        const isEmpty = this.state.taskEdit.progress &&
+            this.state.taskEdit.startDate &&
+            this.state.taskEdit.endDate &&
+            this.state.taskEdit.description;
+        let validDate = (Date.parse(this.state.taskEdit.startDate) > Date.parse(this.state.taskEdit.endDate))
+        if (!isEmpty || validDate) {
+            this.setState({ error: true })
+            return;
+        }
+        this.props.editTask(this.state.taskEdit);
+        this.setState({
+            taskEdit: {},
+            actionType: null,
+            error: false,
+            index: null,
+        });
+    }
+
+    addTask = (e) => {
+        e.stopPropagation();
         const isEmpty = this.state.task.progress &&
             this.state.task.startDate &&
             this.state.task.endDate &&
@@ -66,12 +90,12 @@ class Tasks extends Component {
         if (!isEmpty || validDate) {
             this.setState({ error: true })
             return;
-        }
+        }        
         this.props.addTask(this.state.task);
         this.setState({
             task: { ...initTask },
             error: false,
-        });
+        });        
     };
 
     calculateProgress = (progress) => {
@@ -88,37 +112,178 @@ class Tasks extends Component {
         this.setState({ enableDropdown: !this.state.enableDropdown })
     };
 
+    clearTask = (id, e) => {
+        e.stopPropagation();
+        this.props.removeTask(id);
+    }
+
+    onChangeEditHandler = (type, e) => {
+        e.stopPropagation();
+        let value = e.target.value;
+        if (type.toLowerCase() === 'progress') {
+            if (value > 100) {
+                value = 100;
+            }
+            if (value < 0) {
+                value = 0;
+            }
+        }
+        const newTask = {
+            ...this.state.taskEdit,
+            [type]: value,
+        };
+        this.setState({
+            taskEdit: { ...newTask },
+        });
+    };
+
+    editTask = (task, index, action, e) => {
+        e.stopPropagation();
+        this.setState({
+            index: index,
+            taskEdit: { ...task },
+            actionType: action,
+        });
+    }
+
+    showStatus = (status) => {
+        switch (status.toLowerCase()) {
+            case 'in progress':
+                return (
+                    <span className="light-blue lighten-4"
+                        style={{ padding: '2px 4px', borderRadius: '3px' }}
+                    >{status.toUpperCase()}</span>
+                );
+            case 'un released':
+                return (
+                    <span className="lime lighten-2"
+                        style={{ padding: '2px 4px', borderRadius: '3px' }}
+                    >{status.toUpperCase()}</span>
+                );
+            case 'released':
+                return (
+                    <span className="green lighten-3"
+                        style={{ padding: '2px 4px', borderRadius: '3px' }}
+                    >{status.toUpperCase()}</span>
+                );
+            default:
+                return (
+                    <span className="light-blue lighten-4"
+                        style={{ padding: '2px 4px', borderRadius: '3px' }}
+                    >IN PROGRESS</span>
+                );
+        }
+    };
+
+    getEditTask = (index) => {
+        return (
+            <div className="row left-align" key={'taskedit' + this.state.taskEdit.id}>
+                <div className="col s2 input-field" style={{}}>{this.state.taskEdit.status}</div>
+                <div className="col s2">
+                    <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={this.state.taskEdit.progress}
+                        placeholder='0 - 100%'
+                        onChange={this.onChangeEditHandler.bind(this, 'progress')}
+                    />
+                    {
+                        (this.state.error && !this.state.taskEdit.progress) ?
+                            <div className="red-text">* Progress Required</div> : null
+                    }
+                </div>
+                <div className="col s2">
+                    <input
+                        type="date"
+                        value={this.state.taskEdit.startDate}
+                        onChange={this.onChangeEditHandler.bind(this, 'startDate')}
+                    />
+                    {
+                        (this.state.error && !this.state.taskEdit.startDate) ?
+                            <div className="red-text">* StartDate Required</div> : null
+                    }
+                </div>
+                <div className="col s2">
+                    <input
+                        type="date"
+                        value={this.state.taskEdit.endDate}
+                        onChange={this.onChangeEditHandler.bind(this, 'endDate')}
+                    />
+                    {
+                        (this.state.error && !this.state.taskEdit.endDate) ?
+                            <div className="red-text">* EndDate Required</div> : null
+                    }
+                    {
+                        (Date.parse(this.state.taskEdit.startDate) > Date.parse(this.state.taskEdit.endDate)) ?
+                            <div className="red-text">* EndDate > StartDate</div> : null
+                    }
+                </div>
+                <div className="col s3">
+                    <input
+                        type="text"
+                        value={this.state.taskEdit.description}
+                        placeholder='Add Description'
+                        onChange={this.onChangeEditHandler.bind(this, 'description')}
+                    />
+                    {
+                        (this.state.error && !this.state.taskEdit.description) ?
+                            <div className="red-text">* Desc Required</div> : null
+                    }
+                </div>
+                <div className="col s1">
+                    <button
+                        style={{ height: '2.9rem', width: '100%' }}
+                        className="btn teal white-text"
+                        onClick={this.updateTask.bind(this)}
+                    >EDIT</button>
+                </div>
+            </div>
+        )
+    };
+
     getTasks = () => {
         return (
-            this.props.tasks.map(task => {
+            this.props.tasks.map((task, index) => {
                 return (
-                    <div
-                        className="row Hover Hover-task-items"
-                        key={'task' + task.id}
-                        style={{
-                            padding: '10px'
-                        }}
-                        draggable
-                        onDragStart={(e) => {
-                            e.dataTransfer.setData("dragContent", JSON.stringify(task));
-                        }}
-                    >
-                        <div className="col s2">{task.status}</div>
-                        <div className="col s2">
-                            {
-                                this.calculateProgress(task.progress)
-                            }
+                    (this.state.actionType === 'edit' && this.state.index === index) ?
+                        this.getEditTask(index)
+                        :
+                        <div
+                            className="row Hover Hover-task-items"
+                            key={'task' + task.id}
+                            style={{
+                                padding: '10px'
+                            }}
+                            draggable
+                            onDragStart={(e) => {
+                                e.dataTransfer.setData("dragContent", JSON.stringify(task));
+                            }}
+                        >
+                            <div className="col s2">{this.showStatus(task.status)}</div>
+                            <div className="col s2">
+                                {
+                                    this.calculateProgress(task.progress)
+                                }
+                            </div>
+                            <div className="col s2">{this.formatDate(task.startDate)}</div>
+                            <div className="col s2">{this.formatDate(task.endDate)}</div>
+                            <div className="col s2 truncate">{task.description}</div>
+                            <div className="col s1">
+                                <button
+                                    style={{ height: '2.9rem', width: '100%' }}
+                                    className="btn teal white-text"
+                                    onClick={this.editTask.bind(this, task, index, 'edit')}
+                                >EDIT</button>
+                            </div>
+                            <div className="col s1">
+                                <button
+                                    style={{ height: '2.9rem', width: '100%' }}
+                                    className="btn teal white-text"
+                                    onClick={this.clearTask.bind(this, task.id)}
+                                >CLEAR</button>
+                            </div>
                         </div>
-                        <div className="col s2">{this.formatDate(task.startDate)}</div>
-                        <div className="col s2">{this.formatDate(task.endDate)}</div>
-                        <div className="col s3 truncate">{task.description}</div>
-                        <div className="col s1">
-                            <button
-                                style={{ height: '2.9rem', width: '100%' }}
-                                className="btn teal white-text"                            
-                            >EDIT</button>
-                        </div>
-                    </div>
                 );
             })
         );
@@ -175,7 +340,7 @@ class Tasks extends Component {
                         onChange={this.onChangeHandler.bind(this, 'progress')}
                     />
                     {
-                        (this.state.error && !this.state.task.progress) ?
+                        (this.state.error && !this.state.task.progress && !this.state.actionType) ?
                             <div className="red-text">* Progress Required</div> : null
                     }
                 </div>
@@ -186,7 +351,7 @@ class Tasks extends Component {
                         onChange={this.onChangeHandler.bind(this, 'startDate')}
                     />
                     {
-                        (this.state.error && !this.state.task.startDate) ?
+                        (this.state.error && !this.state.task.startDate && !this.state.actionType) ?
                             <div className="red-text">* StartDate Required</div> : null
                     }
                 </div>
@@ -197,7 +362,7 @@ class Tasks extends Component {
                         onChange={this.onChangeHandler.bind(this, 'endDate')}
                     />
                     {
-                        (this.state.error && !this.state.task.endDate) ?
+                        (this.state.error && !this.state.task.endDate && !this.state.actionType) ?
                             <div className="red-text">* EndDate Required</div> : null
                     }
                     {
@@ -213,7 +378,7 @@ class Tasks extends Component {
                         onChange={this.onChangeHandler.bind(this, 'description')}
                     />
                     {
-                        (this.state.error && !this.state.task.description) ?
+                        (this.state.error && !this.state.task.description && !this.state.actionType) ?
                             <div className="red-text">* Desc Required</div> : null
                     }
                 </div>
@@ -221,8 +386,8 @@ class Tasks extends Component {
                     <button
                         style={{ height: '2.9rem', width: '100%' }}
                         className="btn teal white-text"
-                        onClick={this.addTask}
-                    >ADD</button>
+                        onClick={this.addTask.bind(this)}
+                    >ADD</button>                    
                 </div>
             </div>
         );
@@ -264,6 +429,12 @@ const mapDispatchToProps = (dispatch) => {
     return {
         addTask: (task) => {
             dispatch({ type: 'ADD_TASK', task });
+        },
+        removeTask: (tId) => {
+            dispatch({ type: 'DELETE_TASK', tId });
+        },
+        editTask: (task) => {
+            dispatch({ type: 'EDIT_TASK', task });
         },
     }
 };

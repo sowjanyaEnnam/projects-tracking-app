@@ -23,9 +23,9 @@ const taskReducer = (state = initialState, action) => {
 
     switch (action.type) {
 
-        case 'ADD_TASK':
+        case 'ADD_TASK':            
             action.task.id = ++(newState.count);
-            newState.tasks = [...newState.tasks, action.task];
+            newState.tasks = [...newState.tasks, action.task];            
             break;
 
         case 'UPDATE_TASK':
@@ -34,8 +34,13 @@ const taskReducer = (state = initialState, action) => {
             newState.tasks = [...newState.tasks, { ...task }];
             break;
 
-        case 'REMOVE_RELEASE':
-            // delete tasks here            
+        case 'EDIT_TASK':
+            newState.tasks = newState.tasks.filter(task => task.id !== action.task.id);
+            newState.tasks = [...newState.tasks, action.task];                       
+            break;
+
+        case 'DELETE_TASK':
+            newState.tasks = newState.tasks.filter(task => task.id !== action.tId);
             break;
 
         case 'persist/REHYDRATE':
